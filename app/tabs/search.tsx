@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, TextInput, Button, Card, Appbar } from 'react-native-paper';
+import { Text, TextInput, Button, Card, Appbar, SegmentedButtons, Menu, TouchableRipple } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
-import { ArrowLeft, Search } from 'lucide-react-native';
+import { ArrowLeft, Search, ChevronDown } from 'lucide-react-native';
 
-// Hardcoded client/property data
 const CLIENT_DATA = [
   {
     id: '1',
@@ -52,10 +51,42 @@ const CLIENT_DATA = [
   },
 ];
 
+const CLIENT_OPTIONS = [
+  { label: 'Last name', value: 'last_name' },
+  { label: 'Company name', value: 'company_name' },
+];
+
+const PROPERTY_OPTIONS = [
+  { label: 'Address', value: 'property_address' },
+  { label: 'PIN Number', value: 'property_name' },
+];
+
 export default function SearchScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState(CLIENT_DATA);
+  const [searchMode, setSearchMode] = useState('client');
+  const [searchFilter, setSearchFilter] = useState('last_name')
+  const [menuVisible, setMenuVisible] = useState(false);
   const layout = useResponsiveLayout();
+
+  useEffect(() => {
+    if (searchMode === 'client') {
+      setSearchFilter('last_name');
+    } else {
+      setSearchFilter('property_address');
+    }
+  }, [searchMode]);
+
+  const openMenu = () => setMenuVisible(true);
+  const closeMenu = () => setMenuVisible(false);
+
+  const getCurrentFilterLabel = () => {
+    if (searchMode === 'client') {
+      return CLIENT_OPTIONS.find(option => option.value === searchFilter)?.label || 'Last name';
+    } else {
+      return PROPERTY_OPTIONS.find(option => option.value === searchFilter)?.label || 'Address';
+    }
+  };
 
   const handleSearch = () => {
     if (!searchQuery.trim()) {
@@ -63,11 +94,14 @@ export default function SearchScreen() {
       return;
     }
 
-    const filtered = CLIENT_DATA.filter(
-      (item) =>
-        item.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.propertyAddress.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
+    const filtered = CLIENT_DATA.filter((item) => {
+      const query = searchQuery.toLowerCase();
+      if (searchMode === 'client') {
+        return item.clientName.toLowerCase().includes(query);
+      } else {
+        return item.propertyAddress.toLowerCase().includes(query);
+      }
+    });
     setFilteredData(filtered);
   };
 
@@ -108,32 +142,84 @@ export default function SearchScreen() {
         <View style={styles.mainContent}>
           <Card style={styles.searchCard}>
             <Card.Content style={styles.searchCardContent}>
-              <TextInput
-                label="Search by client name or property address"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                mode="outlined"
-                style={styles.searchInput}
-                contentStyle={styles.inputContent}
-                right={
-                  <TextInput.Icon
-                    icon={() => (
-                      <Search size={layout.isTablet ? 28 : 24} color="#fff" />
-                    )}
-                    onPress={handleSearch}
-                  />
-                }
-                onSubmitEditing={handleSearch}
+
+              <SegmentedButtons
+                value={searchMode}
+                onValueChange={(value) => {
+                  setSearchMode(value);
+                }}
+                buttons={[
+                  {
+                    value: 'client',
+                    label: 'Client',
+                    style: searchMode === 'client' ? styles.selectedSegmentedButton : styles.segmentedButton,
+                    labelStyle: searchMode === 'client' ? styles.selectedSegmentedButtonLabel : styles.segmentedButtonLabel,
+                  },
+                  {
+                    value: 'property',
+                    label: 'Property',
+                    style: searchMode === 'property' ? styles.selectedSegmentedButton : styles.segmentedButton,
+                    labelStyle: searchMode === 'property' ? styles.selectedSegmentedButtonLabel : styles.segmentedButtonLabel,
+                  },
+                ]}
+                style={styles.segmentedButtonsContainer}
               />
-              <Button
-                mode="contained"
-                onPress={handleSearch}
-                style={styles.searchButton}
-                contentStyle={styles.buttonContent}
-                labelStyle={styles.buttonLabel}
-              >
-                SEARCH
-              </Button>
+              
+              <View style={styles.searchRow}>
+                <Menu
+                  visible={menuVisible}
+                  onDismiss={closeMenu}
+                  anchor={
+                    <TouchableRipple onPress={openMenu} style={styles.dropdownButton}>
+                      <View style={styles.dropdownButtonContent}>
+                        <Text style={styles.dropdownButtonLabel}>{getCurrentFilterLabel()}</Text>
+                        <ChevronDown size={layout.isTablet ? 24 : 20} color="#081A51" />
+                      </View>
+                    </TouchableRipple>
+                  }
+                  anchorPosition="bottom"
+                  contentStyle={styles.menuContent}
+                >
+                  {(searchMode === 'client' ? CLIENT_OPTIONS : PROPERTY_OPTIONS).map((option) => (
+                    <Menu.Item 
+                      key={option.value}
+                      onPress={() => {
+                        console.log('Menu item pressed:', option.value);
+                        setSearchFilter(option.value);
+                        closeMenu();
+                      }} 
+                      title={option.label}
+                      titleStyle={searchFilter === option.value ? styles.selectedMenuItemText : {}}
+                      style={searchFilter === option.value ? styles.selectedMenuItem : {}}
+                    />
+                  ))}
+                </Menu>
+                <TextInput
+                  placeholder={`Search by ${searchMode === 'client' ? 'client name' : 'property address'}`}
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  mode="outlined"
+                  style={styles.searchInput}
+                  contentStyle={styles.inputContent}
+                  right={
+                    <TextInput.Icon
+                      icon={() => (
+                        <Search size={layout.isTablet ? 22 : 18} color="#94A3B8" />
+                      )}
+                    />
+                  }
+                  onSubmitEditing={handleSearch}
+                  outlineStyle={styles.inputOutline}
+                />
+                <Button
+                  mode="contained"
+                  onPress={handleSearch}
+                  style={styles.searchButton}
+                  labelStyle={styles.searchButtonLabel}
+                >
+                  SEARCH
+                </Button>
+              </View>
             </Card.Content>
           </Card>
 
@@ -211,29 +297,46 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
     },
     searchCard: {
       marginBottom: layout.buttonSpacing * 1.5,
-      elevation: 2,
       borderRadius: layout.isTablet ? 16 : 12,
+      backgroundColor: '#fff',
+      borderWidth: 1,
+      borderColor: '#D1D5DB',
+      elevation: 0,
+      shadowColor: undefined,
+      shadowOffset: undefined,
+      shadowOpacity: undefined,
+      shadowRadius: undefined,
     },
     searchCardContent: {
       padding: layout.isTablet ? 32 : 24,
     },
     searchInput: {
-      marginBottom: layout.buttonSpacing,
+      flex: 1,
+      backgroundColor: '#FFFFFF',
+      height: layout.isTablet ? 58 : 48,
+      minHeight: layout.isTablet ? 58 : 48,
     },
     inputContent: {
       fontSize: layout.fontSize.medium,
     },
+    inputOutline: {
+      borderRadius: layout.isTablet ? 12 : 8,
+      borderWidth: 1,
+      borderColor: '#CBD5E1',
+    },
     searchButton: {
       backgroundColor: '#081A51',
       borderRadius: layout.isTablet ? 12 : 8,
+      elevation: 0,
+      height: layout.isTablet ? 58 : 48,
+      minHeight: layout.isTablet ? 58 : 48,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
-    buttonContent: {
-      paddingVertical: layout.isTablet ? 16 : 8,
-    },
-    buttonLabel: {
-      color: '#ffff',
-      fontSize: layout.fontSize.medium,
+    searchButtonLabel: {
       fontWeight: 'bold',
+      fontSize: layout.fontSize.medium,
+      color: '#FFFFFF',
     },
     resultsContainer: {
       flex: 1,
@@ -252,10 +355,17 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
     },
     resultCard: {
       marginBottom: layout.buttonSpacing / 2,
-      elevation: 1,
       borderRadius: layout.isTablet ? 12 : 8,
       flex: layout.isTablet && layout.isLandscape ? 1 : undefined,
       minWidth: layout.isTablet && layout.isLandscape ? '48%' : undefined,
+      backgroundColor: '#fff',
+      borderWidth: 1,
+      borderColor: '#D1D5DB',
+      elevation: 0,
+      shadowColor: undefined,
+      shadowOffset: undefined,
+      shadowOpacity: undefined,
+      shadowRadius: undefined,
     },
     resultCardContent: {
       padding: layout.isTablet ? 24 : 16,
@@ -292,8 +402,15 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
       color: '#9CA3AF',
     },
     noResultsCard: {
-      elevation: 1,
       borderRadius: layout.isTablet ? 12 : 8,
+      backgroundColor: '#fff',
+      borderWidth: 1,
+      borderColor: '#D1D5DB',
+      elevation: 0,
+      shadowColor: undefined,
+      shadowOffset: undefined,
+      shadowOpacity: undefined,
+      shadowRadius: undefined,
     },
     noResultsCardContent: {
       padding: layout.isTablet ? 32 : 24,
@@ -302,6 +419,69 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
       textAlign: 'center',
       color: '#6B7280',
       fontSize: layout.fontSize.medium,
+    },
+    segmentedButtonsContainer: {
+      borderRadius: layout.isTablet ? 12 : 8,
+      marginBottom: layout.contentPadding,
+      borderWidth: 1,
+      borderColor: '#081A51',
+      overflow: 'hidden',
+    },
+    segmentedButton: {
+      backgroundColor: '#FFFFFF',
+      borderRadius: 0,
+      borderWidth: 0,
+    },
+    selectedSegmentedButton: {
+      backgroundColor: '#081A51',
+      borderRadius: 0,
+      borderWidth: 0,
+    },
+    segmentedButtonLabel: {
+      color: '#081A51',
+      fontSize: layout.fontSize.medium,
+      fontWeight: 'bold',
+    },
+    selectedSegmentedButtonLabel: {
+      color: '#FFFFFF',
+      fontSize: layout.fontSize.medium,
+      fontWeight: 'bold',
+    },
+    searchRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: layout.isTablet ? 16 : 8,
+    },
+    dropdownButton: {
+      borderWidth: 1,
+      borderColor: '#CBD5E1',
+      borderRadius: layout.isTablet ? 12 : 8,
+      backgroundColor: '#FFFFFF',
+      justifyContent: 'center',
+      paddingHorizontal: 12,
+      height: layout.isTablet ? 58 : 48,
+      minHeight: layout.isTablet ? 58 : 48,
+    },
+    dropdownButtonContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 8,
+    },
+    dropdownButtonLabel: {
+      color: '#081A51',
+      fontSize: layout.fontSize.medium,
+      fontWeight: '500',
+    },
+    menuContent: {
+      borderRadius: layout.isTablet ? 12 : 8,
+    },
+    selectedMenuItem: {
+      backgroundColor: '#E2E8F0',
+    },
+    selectedMenuItemText: {
+      color: '#081A51',
+      fontWeight: 'bold',
     },
   });
 

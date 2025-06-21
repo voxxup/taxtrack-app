@@ -195,7 +195,7 @@ export default function SignatureScreen() {
                           onPress={() => handleViewDocument(document.id)}
                           style={styles.viewButton}
                           contentStyle={styles.smallButtonContent}
-                          labelStyle={styles.smallButtonLabel}
+                          labelStyle={styles.viewButtonLabel}
                           compact
                         >
                           View
@@ -269,9 +269,10 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) => StyleSh
     backgroundColor: '#F8FAFC',
   },
   header: {
-    backgroundColor: '#8B5CF6',
-    elevation: 4,
+    backgroundColor: '#081A51',
     height: layout.isTablet ? 80 : 64,
+    borderBottomWidth: 1,
+    borderColor: '#D1D5DB',
   },
   headerTitle: {
     color: '#FFFFFF',
@@ -291,8 +292,11 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) => StyleSh
   },
   summaryCard: {
     marginBottom: layout.buttonSpacing * 1.5,
-    elevation: 2,
     borderRadius: layout.isTablet ? 16 : 12,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    elevation: 0,
   },
   summaryCardContent: {
     padding: layout.isTablet ? 32 : 24,
@@ -334,10 +338,13 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) => StyleSh
   },
   documentCard: {
     marginBottom: layout.buttonSpacing / 2,
-    elevation: 1,
     borderRadius: layout.isTablet ? 12 : 8,
     flex: layout.isTablet && layout.isLandscape ? 1 : undefined,
     minWidth: layout.isTablet && layout.isLandscape ? '48%' : undefined,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    elevation: 0,
   },
   documentCardContent: {
     padding: layout.isTablet ? 24 : 16,
@@ -388,7 +395,7 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) => StyleSh
     borderRadius: layout.isTablet ? 10 : 8,
   },
   signButton: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#081A51',
     borderRadius: layout.isTablet ? 10 : 8,
   },
   smallButtonContent: {
@@ -396,7 +403,13 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) => StyleSh
     paddingHorizontal: layout.isTablet ? 16 : 12,
   },
   smallButtonLabel: {
+    color: '#FFFFFF',
     fontSize: layout.fontSize.small,
     fontWeight: 'bold',
   },
+  viewButtonLabel: {
+    color: '#081A51',
+    fontSize: layout.fontSize.small,
+    fontWeight: 'bold',
+  },    
 });

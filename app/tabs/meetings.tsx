@@ -214,7 +214,7 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
       backgroundColor: '#F8FAFC',
     },
     header: {
-      backgroundColor: '#EF4444',
+      backgroundColor: '#081A51',
       elevation: 4,
       height: layout.isTablet ? 80 : 64,
     },
@@ -236,8 +236,11 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
     },
     searchCard: {
       marginBottom: layout.buttonSpacing * 1.5,
-      elevation: 2,
       borderRadius: layout.isTablet ? 16 : 12,
+      backgroundColor: '#fff',
+      borderWidth: 1,
+      borderColor: '#D1D5DB',
+      elevation: 0,
     },
     searchCardContent: {
       padding: layout.isTablet ? 32 : 24,
@@ -249,13 +252,14 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
       fontSize: layout.fontSize.medium,
     },
     searchButton: {
-      backgroundColor: '#EF4444',
+      backgroundColor: '#081A51',
       borderRadius: layout.isTablet ? 12 : 8,
     },
     buttonContent: {
       paddingVertical: layout.isTablet ? 16 : 8,
     },
     buttonLabel: {
+      color: '#FFFFFF',
       fontSize: layout.fontSize.medium,
       fontWeight: 'bold',
     },
@@ -276,10 +280,13 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
     },
     meetingCard: {
       marginBottom: layout.buttonSpacing / 2,
-      elevation: 1,
       borderRadius: layout.isTablet ? 12 : 8,
       flex: layout.isTablet && layout.isLandscape ? 1 : undefined,
       minWidth: layout.isTablet && layout.isLandscape ? '48%' : undefined,
+      backgroundColor: '#fff',
+      borderWidth: 1,
+      borderColor: '#D1D5DB',
+      elevation: 0,
     },
     meetingCardContent: {
       padding: layout.isTablet ? 24 : 16,
@@ -324,8 +331,11 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
       color: '#9CA3AF',
     },
     noResultsCard: {
-      elevation: 1,
       borderRadius: layout.isTablet ? 12 : 8,
+      backgroundColor: '#fff',
+      borderWidth: 1,
+      borderColor: '#D1D5DB',
+      elevation: 0,
     },
     noResultsCardContent: {
       padding: layout.isTablet ? 32 : 24,

@@ -34,10 +34,8 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <Appbar.Header style={styles.header}>
         <Appbar.Content
-          title="PropertyTax.com"
-          subtitle="Tax Track System"
+          title="Tax Track System"
           titleStyle={styles.headerTitle}
-          subtitleStyle={styles.headerSubtitle}
         />
         <Appbar.Action
           icon={() => (
@@ -115,10 +113,6 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
       fontSize: layout.fontSize.large,
       fontWeight: 'bold',
     },
-    headerSubtitle: {
-      color: '#E2E8F0',
-      fontSize: layout.fontSize.medium,
-    },
     content: {
       flex: 1,
     },
@@ -132,8 +126,11 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
     },
     welcomeCard: {
       marginBottom: layout.buttonSpacing * 1.5,
-      elevation: 2,
+      elevation: 0,
       borderRadius: layout.isTablet ? 16 : 12,
+      backgroundColor: '#fff',
+      borderWidth: 1,
+      borderColor: '#D1D5DB',
     },
     welcomeCardContent: {
       padding: layout.isTablet ? 32 : 24,
@@ -157,7 +154,11 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
     },
     actionButton: {
       borderRadius: layout.isTablet ? 16 : 12,
-      elevation: 3,
+      elevation: 0,
+      shadowColor: undefined,
+      shadowOffset: undefined,
+      shadowOpacity: undefined,
+      shadowRadius: undefined,
     },
     buttonContent: {
       paddingVertical: layout.isTablet ? 24 : 16,

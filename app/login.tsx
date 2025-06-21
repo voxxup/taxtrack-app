@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert, Dimensions } from 'react-native';
+import { View, StyleSheet, Alert, Dimensions, ViewStyle, TextStyle, ImageStyle } from 'react-native';
 import { TextInput, Button, Text, Card, Title } from 'react-native-paper';
 import { useAuth } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
@@ -56,10 +56,8 @@ export default function LoginScreen() {
               value={username}
               onChangeText={setUsername}
               mode="outlined"
-              style={styles.input}
               autoCapitalize="none"
               autoCorrect={false}
-              contentStyle={styles.inputContent}
             />
 
             <TextInput
@@ -68,8 +66,6 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               mode="outlined"
               secureTextEntry
-              style={styles.input}
-              contentStyle={styles.inputContent}
             />
 
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -93,7 +89,18 @@ export default function LoginScreen() {
 }
 
 const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
-  StyleSheet.create({
+  StyleSheet.create<{
+    container: ViewStyle;
+    content: ViewStyle;
+    card: ViewStyle;
+    cardContent: ViewStyle;
+    title: TextStyle;
+    input: ViewStyle;
+    errorText: TextStyle;
+    loginButton: ViewStyle;
+    loginButtonContent: ViewStyle;
+    loginButtonLabel: TextStyle;
+  }>({
     container: {
       flex: 1,
       backgroundColor: '#F8FAFC',
@@ -105,10 +112,17 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
       paddingHorizontal: layout.contentPadding,
     },
     card: {
-      elevation: 4,
-      borderRadius: layout.isTablet ? 16 : 12,
-      width: layout.cardWidth,
-      maxWidth: layout.isTablet ? 500 : undefined,
+      borderRadius: layout.isTablet ? 16 : 15,
+      width: typeof layout.cardWidth === 'number' ? layout.cardWidth : 400,
+      maxWidth: layout.isTablet ? 500 : 400,
+      backgroundColor: '#fff',
+      borderWidth: 1,
+      borderColor: '#D1D5DB',
+      elevation: 0,
+      shadowColor: undefined,
+      shadowOffset: undefined,
+      shadowOpacity: undefined,
+      shadowRadius: undefined,
     },
     cardContent: {
       paddingVertical: layout.isTablet ? 48 : 32,
@@ -124,9 +138,6 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
     input: {
       marginBottom: layout.buttonSpacing,
     },
-    inputContent: {
-      fontSize: layout.fontSize.medium,
-    },
     errorText: {
       color: '#EF4444',
       textAlign: 'center',
@@ -136,7 +147,9 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
     loginButton: {
       marginTop: layout.buttonSpacing,
       backgroundColor: '#081A51',
-      borderRadius: layout.isTablet ? 12 : 8,
+      borderRadius: layout.isTablet ? 12 : 12,
+      borderWidth: 1,
+      borderColor: '#D1D5DB',
     },
     loginButtonContent: {
       paddingVertical: layout.isTablet ? 16 : 8,

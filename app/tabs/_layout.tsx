@@ -14,10 +14,8 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: '#081A51',
           borderTopWidth: 0,
-          elevation: 8,
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
+          borderWidth: 1,
+          borderColor: '#D1D5DB',
         },
         tabBarActiveTintColor: '#FFFFFF',
         tabBarInactiveTintColor: '#94A3B8',
