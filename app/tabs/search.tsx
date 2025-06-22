@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, TextInput, Button, Card, Appbar, SegmentedButtons, Menu, TouchableRipple } from 'react-native-paper';
+import { Text, TextInput, Button, Card, Appbar, SegmentedButtons, Menu, TouchableRipple, Checkbox, FAB } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
-import { ArrowLeft, Search, ChevronDown } from 'lucide-react-native';
+import { ArrowLeft, Search, ChevronDown, Plus } from 'lucide-react-native';
 
 const CLIENT_DATA = [
   {
@@ -67,6 +67,7 @@ export default function SearchScreen() {
   const [searchMode, setSearchMode] = useState('client');
   const [searchFilter, setSearchFilter] = useState('last_name')
   const [menuVisible, setMenuVisible] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const layout = useResponsiveLayout();
 
   useEffect(() => {
@@ -118,6 +119,27 @@ export default function SearchScreen() {
     }
   };
 
+  const handleItemSelect = (itemId: string) => {
+    setSelectedItems(prev => {
+      if (prev.includes(itemId)) {
+        return prev.filter(id => id !== itemId);
+      } else {
+        return [...prev, itemId];
+      }
+    });
+  };
+
+  const handleAddMeeting = () => {
+    // Navigate to meetings screen with selected items
+    console.log('Adding meeting for selected items:', selectedItems);
+    // You can implement navigation to meetings screen here
+    // router.push('/tabs/meetings');
+  };
+
+  const clearSelection = () => {
+    setSelectedItems([]);
+  };
+
   const styles = createStyles(layout);
 
   return (
@@ -132,13 +154,17 @@ export default function SearchScreen() {
           title="Search Client / Property"
           titleStyle={styles.headerTitle}
         />
+        {selectedItems.length > 0 && (
+          <Appbar.Action
+            icon="close"
+            color="#FFFFFF"
+            size={layout.isTablet ? 28 : 24}
+            onPress={clearSelection}
+          />
+        )}
       </Appbar.Header>
 
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={styles.content}>
         <View style={styles.mainContent}>
           <Card style={styles.searchCard}>
             <Card.Content style={styles.searchCardContent}>
@@ -224,46 +250,91 @@ export default function SearchScreen() {
           </Card>
 
           <View style={styles.resultsContainer}>
-            <Text style={styles.resultsTitle}>
-              Search Results ({filteredData.length})
-            </Text>
-
-            <View style={styles.resultsGrid}>
-              {filteredData.map((item) => (
-                <Card key={item.id} style={styles.resultCard}>
-                  <Card.Content style={styles.resultCardContent}>
-                    <View style={styles.resultHeader}>
-                      <Text style={styles.clientName}>{item.clientName}</Text>
-                      <View
-                        style={[
-                          styles.statusBadge,
-                          { backgroundColor: getStatusColor(item.status) },
-                        ]}
-                      >
-                        <Text style={styles.statusText}>{item.status}</Text>
-                      </View>
-                    </View>
-                    <Text style={styles.propertyAddress}>
-                      {item.propertyAddress}
-                    </Text>
-                    <Text style={styles.taxYear}>Tax Year: {item.taxYear}</Text>
-                  </Card.Content>
-                </Card>
-              ))}
+            <View style={styles.resultsHeader}>
+              <Text style={styles.resultsTitle}>
+                Search Results ({filteredData.length})
+              </Text>
+              {selectedItems.length > 0 && (
+                <Text style={styles.selectedCount}>
+                  {selectedItems.length} selected
+                </Text>
+              )}
             </View>
 
-            {filteredData.length === 0 && searchQuery.trim() && (
-              <Card style={styles.noResultsCard}>
-                <Card.Content style={styles.noResultsCardContent}>
-                  <Text style={styles.noResultsText}>
-                    No clients or properties found matching "{searchQuery}"
-                  </Text>
-                </Card.Content>
-              </Card>
-            )}
+            <ScrollView
+              style={styles.resultsScrollView}
+              contentContainerStyle={styles.resultsScrollContent}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.resultsGrid}>
+                {filteredData.map((item) => (
+                  <Card 
+                    key={item.id} 
+                    style={[
+                      styles.resultCard,
+                      selectedItems.includes(item.id) && styles.selectedResultCard
+                    ]}
+                  >
+                    <TouchableRipple onPress={() => handleItemSelect(item.id)}>
+                      <Card.Content style={styles.resultCardContent}>
+                        <View style={styles.resultHeader}>
+                          <Text style={styles.clientName}>{item.clientName}</Text>
+                          <View style={styles.rightSection}>
+                            <View
+                              style={[
+                                styles.statusBadge,
+                                { backgroundColor: getStatusColor(item.status) },
+                              ]}
+                            >
+                              <Text style={styles.statusText}>{item.status}</Text>
+                            </View>
+                            <View style={styles.checkboxContainer}>
+                              <Checkbox
+                                status={selectedItems.includes(item.id) ? 'checked' : 'unchecked'}
+                                onPress={() => handleItemSelect(item.id)}
+                                color="#081A51"
+                              />
+                            </View>
+                          </View>
+                        </View>
+                        <Text style={styles.propertyAddress}>
+                          {item.propertyAddress}
+                        </Text>
+                        <Text style={styles.taxYear}>Tax Year: {item.taxYear}</Text>
+                      </Card.Content>
+                    </TouchableRipple>
+                  </Card>
+                ))}
+              </View>
+
+              {filteredData.length === 0 && searchQuery.trim() && (
+                <Card style={styles.noResultsCard}>
+                  <Card.Content style={styles.noResultsCardContent}>
+                    <Text style={styles.noResultsText}>
+                      No clients or properties found matching "{searchQuery}"
+                    </Text>
+                  </Card.Content>
+                </Card>
+              )}
+            </ScrollView>
           </View>
         </View>
-      </ScrollView>
+      </View>
+
+      {selectedItems.length > 0 && (
+        <View style={styles.fabContainer}>
+          <Button
+            mode="contained"
+            icon={() => <Plus size={24} color="#FFFFFF" />}
+            onPress={handleAddMeeting}
+            style={styles.fab}
+            labelStyle={styles.fabLabel}
+            contentStyle={styles.fabContent}
+          >
+            Add Meeting
+          </Button>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -286,14 +357,13 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
     },
     content: {
       flex: 1,
-    },
-    contentContainer: {
       padding: layout.contentPadding,
       alignItems: 'center',
     },
     mainContent: {
       width: '100%',
       maxWidth: layout.isTablet ? 1200 : undefined,
+      flex: 1,
     },
     searchCard: {
       marginBottom: layout.buttonSpacing * 1.5,
@@ -340,13 +410,31 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
     },
     resultsContainer: {
       flex: 1,
+      marginTop: layout.buttonSpacing * 1.5,
+    },
+    resultsHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: layout.buttonSpacing,
+      width: '100%',
     },
     resultsTitle: {
       fontSize: layout.fontSize.large,
       fontWeight: 'bold',
       color: '#1F2937',
-      marginBottom: layout.buttonSpacing,
       textAlign: layout.isTablet ? 'center' : 'left',
+    },
+    selectedCount: {
+      fontSize: layout.fontSize.medium,
+      color: '#6B7280',
+      fontWeight: '500',
+    },
+    resultsScrollView: {
+      flex: 1,
+    },
+    resultsScrollContent: {
+      paddingBottom: layout.contentPadding,
     },
     resultsGrid: {
       flexDirection: layout.isTablet && layout.isLandscape ? 'row' : 'column',
@@ -367,6 +455,10 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
       shadowOpacity: undefined,
       shadowRadius: undefined,
     },
+    selectedResultCard: {
+      borderWidth: 2,
+      borderColor: '#081A51',
+    },
     resultCardContent: {
       padding: layout.isTablet ? 24 : 16,
     },
@@ -375,6 +467,11 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
       justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: 12,
+    },
+    rightSection: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: layout.isTablet ? 16 : 8,
     },
     clientName: {
       fontSize: layout.fontSize.medium,
@@ -482,6 +579,28 @@ const createStyles = (layout: ReturnType<typeof useResponsiveLayout>) =>
     selectedMenuItemText: {
       color: '#081A51',
       fontWeight: 'bold',
+    },
+    fabContainer: {
+      position: 'absolute',
+      right: layout.contentPadding,
+      bottom: layout.contentPadding,
+      left: layout.contentPadding,
+      transform: [{ translateX: 0 }, { translateY: 0 }],
+    },
+    fab: {
+      backgroundColor: '#081A51',
+      color: '#FFFFFF',
+    },
+    fabLabel: {
+      fontWeight: 'bold',
+      fontSize: layout.fontSize.medium,
+    },
+    fabContent: {
+      padding: layout.isTablet ? 10 : 5,
+      transform: [{ translateX: 0 }, { translateY: 0 }],
+    },
+    checkboxContainer: {
+      marginRight: layout.isTablet ? 10 : 5,
     },
   });
 

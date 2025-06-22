@@ -15,6 +15,7 @@ export const removeShadows = (style: any) => {
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
     shadowRadius: 0,
+    ...noShadowStyles
   };
 };
 
