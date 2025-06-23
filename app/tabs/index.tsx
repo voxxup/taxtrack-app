@@ -11,8 +11,8 @@ export default function HomeScreen() {
   const { user, logout } = useAuth();
   const layout = useResponsiveLayout();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.replace('/login');
   };
 
@@ -53,7 +53,7 @@ export default function HomeScreen() {
         <View style={styles.mainContent}>
           <Card style={styles.welcomeCard}>
             <Card.Content style={styles.welcomeCardContent}>
-              <Text style={styles.welcomeText}>Welcome, {user?.username}!</Text>
+              <Text style={styles.welcomeText}>Welcome, {user?.first_name} {user?.last_name}!</Text>
               <Text style={styles.subtitleText}>
                 by: Fitzgerald Law Group, P.C. Chicago / Burr Ridge
               </Text>

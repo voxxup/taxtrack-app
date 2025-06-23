@@ -1,6 +1,6 @@
-import axiosHttp from "./axiosHttp";
+import { axiosHttp } from "./axiosHttp";
 
-export default async function login(username: string, password: string) {
+export default async function loginService(username: string, password: string) {
   const response = await axiosHttp.post('/user/login/', {
     username,
     password,

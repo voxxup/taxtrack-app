@@ -29,17 +29,19 @@ export default function LoginScreen() {
     setLoading(true);
     setError('');
 
-    // Simulate a brief loading delay
-    setTimeout(() => {
-      const success = login(username, password);
-
+    try {
+      const success = await login(username, password);
+      
       if (success) {
         router.replace('/tabs');
       } else {
         setError('Invalid username or password');
       }
+    } catch (error) {
+      setError('Login failed. Please try again.');
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   const styles = createStyles(layout);
@@ -49,7 +51,7 @@ export default function LoginScreen() {
       <View style={styles.content}>
         <Card style={styles.card}>
           <Card.Content style={styles.cardContent}>
-            <Title style={styles.title}>TAXTRACK LOGIN</Title>
+            <Text style={styles.title}>TAXTRACK LOGIN</Text>
 
             <TextInput
               label="Username *"
